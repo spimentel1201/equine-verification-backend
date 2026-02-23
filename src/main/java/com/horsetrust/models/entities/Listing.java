@@ -96,4 +96,8 @@ public class Listing {
     @EqualsAndHashCode.Exclude
     @Builder.Default
     private List<Report> reports = new ArrayList<>();
+
+    @Size(max = 2000, message = "Conditions must not exceed 2000 characters")
+    @Column(length = 2000)
+    private String conditions;
 }
