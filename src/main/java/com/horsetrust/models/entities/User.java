@@ -113,4 +113,8 @@ public class User {
     @EqualsAndHashCode.Exclude
     @Builder.Default
     private List<Report> reports = new ArrayList<>();
+
+    @Size(max = 1000, message = "Bio must not exceed 1000 characters")
+    @Column(length = 1000)
+    private String bio;
 }
