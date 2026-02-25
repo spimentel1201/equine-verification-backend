@@ -23,8 +23,7 @@ public class ListingController {
     @PreAuthorize("hasRole('SELLER')")
     public ListingResponse create(
             @Valid @RequestBody CreateListingRequest request,
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
+            @AuthenticationPrincipal UserPrincipal principal) {
         return listingService.createListing(request, principal.getId());
     }
 
@@ -33,9 +32,16 @@ public class ListingController {
     public ListingResponse update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateListingRequest request,
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
+            @AuthenticationPrincipal UserPrincipal principal) {
         return listingService.updateListing(id, request, principal.getId());
+    }
+
+    @PostMapping("/{id}/rollback")
+    @PreAuthorize("hasRole('SELLER')")
+    public ListingResponse rollbackToDraft(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return listingService.rollbackToDraft(id, principal.getId());
     }
 
     @GetMapping("/my-listings")

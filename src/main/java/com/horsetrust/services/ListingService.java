@@ -18,8 +18,7 @@ public class ListingService {
 
     private final ListingRepository listingRepository;
     private final HorseRepository horseRepository;
-    private final UserRepository userRepository; // asumido
-    // private final VerificationRepository verificationRepository; // no requerido para listing ticket
+    private final UserRepository userRepository;
 
     @Transactional
     public ListingResponse createListing(CreateListingRequest req, UUID sellerId) {
@@ -61,11 +60,28 @@ public class ListingService {
             throw new ForbiddenOperationException("Listing can only be updated when status is DRAFT or REJECTED");
         }
 
-        if (req.price() != null) listing.setPrice(req.price());
-        if (req.location() != null) listing.setLocation(req.location());
-        if (req.description() != null) listing.setDescription(req.description());
-        if (req.conditions() != null) listing.setConditions(req.conditions());
+        if (req.price() != null)
+            listing.setPrice(req.price());
+        if (req.location() != null)
+            listing.setLocation(req.location());
+        if (req.description() != null)
+            listing.setDescription(req.description());
+        if (req.conditions() != null)
+            listing.setConditions(req.conditions());
 
+        return toResponse(listing);
+    }
+
+    @Transactional
+    public ListingResponse rollbackToDraft(UUID listingId, UUID sellerId) {
+        Listing listing = listingRepository.findByIdAndSeller_Id(listingId, sellerId)
+                .orElseThrow(() -> new NotFoundException("Listing not found"));
+
+        if (listing.getStatus() != ListingStatus.REJECTED) {
+            throw new ForbiddenOperationException("Only REJECTED listings can be rolled back to DRAFT");
+        }
+
+        listing.setStatus(ListingStatus.DRAFT);
         return toResponse(listing);
     }
 
@@ -79,7 +95,8 @@ public class ListingService {
     private String generateTitle(Horse horse) {
         String base = horse.getName() + " - " + horse.getBreed();
         base = base.trim().replaceAll("\\s+", " ");
-        if (base.length() < 5) base = "Horse Listing";
+        if (base.length() < 5)
+            base = "Horse Listing";
         return base.length() > 200 ? base.substring(0, 200) : base;
     }
 
@@ -95,7 +112,6 @@ public class ListingService {
                 l.getLocation(),
                 l.getStatus().name(),
                 l.getCreatedAt(),
-                l.getUpdatedAt()
-        );
+                l.getUpdatedAt());
     }
 }
