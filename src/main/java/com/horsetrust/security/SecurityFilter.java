@@ -1,7 +1,7 @@
-package com.horsetrust.security.jwt;
+package com.horsetrust.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.horsetrust.security.DbUserDetailsService;
+import com.horsetrust.security.jwt.TokenService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
@@ -47,8 +47,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 var userDetails = userDetailsService.loadUserByUsername(email);
 
                 var authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                        userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
