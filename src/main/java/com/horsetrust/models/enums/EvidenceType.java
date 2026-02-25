@@ -1,8 +1,8 @@
 package com.horsetrust.models.enums;
 
 public enum EvidenceType {
-    PHOTO,
+    VET_RECORD,
     VIDEO,
-    DOCUMENT,
-    VETERINARY_RECORD
+    CERT,
+    OTHER
 }

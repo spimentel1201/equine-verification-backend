@@ -1,5 +1,6 @@
 package com.horsetrust.models.entities;
 
+import com.horsetrust.models.enums.EvidenceStatus;
 import com.horsetrust.models.enums.EvidenceType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -27,6 +28,12 @@ public class Evidence {
     @Column(nullable = false, length = 30)
     private EvidenceType type;
 
+    @NotNull(message = "Evidence status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    @Builder.Default
+    private EvidenceStatus status = EvidenceStatus.PENDING_REVIEW;
+
     @NotBlank(message = "File URL is required")
     @Size(max = 500, message = "File URL must not exceed 500 characters")
     @Column(nullable = false, length = 500)
@@ -35,6 +42,10 @@ public class Evidence {
     @Size(max = 500, message = "Description must not exceed 500 characters")
     @Column(length = 500)
     private String description;
+
+    @Size(max = 2000, message = "Metadata must not exceed 2000 characters")
+    @Column(length = 2000)
+    private String metadata;
 
     @CreationTimestamp
     @Column(updatable = false)
