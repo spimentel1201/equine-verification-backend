@@ -47,13 +47,21 @@ public class HorseService {
     }
 
     // Para cuando implementes PUT /horses/{id}
-    @Transactional
+    @Transactional(readOnly = true)
     public void assertIdentityNotLocked(UUID horseId) {
-        boolean locked = verificationRepository.existsByListing_Horse_Id(horseId);
+        // Verificar si algún listing de este horse tiene verificaciones históricas
+        List<UUID> listingIds = horseRepository.findById(horseId)
+                .map(horse -> horse.getListings().stream()
+                        .map(listing -> listing.getId())
+                        .toList())
+                .orElse(List.of());
+
+        boolean locked = listingIds.stream()
+                .anyMatch(id -> verificationRepository.existsByTargetAndTargetId(
+                        com.horsetrust.models.enums.VerificationTarget.LISTING, id));
         if (locked) {
             throw new ForbiddenOperationException(
-                    "Horse identity data cannot be changed because it is linked to historical verifications"
-            );
+                    "Horse identity data cannot be changed because it is linked to historical verifications");
         }
     }
 
@@ -69,7 +77,6 @@ public class HorseService {
                 h.getAge(),
                 h.getGender(),
                 h.getOwner().getId(),
-                h.getCreatedAt()
-        );
+                h.getCreatedAt());
     }
 }
