@@ -47,13 +47,31 @@ public class AuthService {
         return new LoginResponseDTO(access, refresh, UserResponse.from(saved));
     }
 
+    @Transactional
+    public UserResponse registerAdmin(RegisterRequest req) {
+        String email = req.email().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
+        User saved = userRepository.save(User.builder()
+                .email(email)
+                .password(encoder.encode(req.password()))
+                .firstName(req.firstName().trim())
+                .lastName(req.lastName().trim())
+                .role(UserRole.ADMIN) // Frozamos el rol a ADMIN
+                .status(UserStatus.ACTIVE)
+                .build());
+
+        return UserResponse.from(saved);
+    }
+
     @Transactional(readOnly = true)
     public LoginResponseDTO login(LoginRequest req) {
         String email = req.email().trim().toLowerCase();
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, req.password())
-        );
+                new UsernamePasswordAuthenticationToken(email, req.password()));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("User not found after auth"));

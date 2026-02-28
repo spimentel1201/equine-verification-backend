@@ -79,12 +79,6 @@ public class Listing {
     @Builder.Default
     private List<Evidence> evidences = new ArrayList<>();
 
-    @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Builder.Default
-    private List<Verification> verifications = new ArrayList<>();
-
     @OneToMany(mappedBy = "listing")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

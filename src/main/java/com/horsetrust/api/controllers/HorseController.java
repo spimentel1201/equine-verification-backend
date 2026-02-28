@@ -3,6 +3,9 @@ package com.horsetrust.api.controllers;
 import com.horsetrust.api.dto.*;
 import com.horsetrust.security.UserPrincipal;
 import com.horsetrust.services.HorseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,23 +17,24 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/horses")
+@Tag(name = "Horses", description = "Gestión de caballos")
+@SecurityRequirement(name = "bearerAuth")
 public class HorseController {
 
     private final HorseService horseService;
 
-    // "Registra la identidad inmutable de un caballo (requiere rol SELLER)"
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Registrar caballo", description = "Registra la identidad inmutable(no editable) de un caballo. Requiere rol VENDEDOR o SELLER.")
     public HorseResponse register(
             @Valid @RequestBody CreateHorseRequest request,
-            @AuthenticationPrincipal UserPrincipal principal
-    ) {
+            @AuthenticationPrincipal UserPrincipal principal) {
         return horseService.register(request, principal.getId());
     }
 
-    // "Devuelve la lista de caballos registrados por el usuario autenticado"
     @GetMapping("/my-horses")
     @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Mis caballos", description = "Devuelve los caballos registrados por el vendedor autenticado.")
     public List<HorseResponse> myHorses(@AuthenticationPrincipal UserPrincipal principal) {
         return horseService.myHorses(principal.getId());
     }

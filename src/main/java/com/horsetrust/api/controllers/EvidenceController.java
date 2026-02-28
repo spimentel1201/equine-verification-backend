@@ -3,6 +3,9 @@ package com.horsetrust.api.controllers;
 import com.horsetrust.api.dto.*;
 import com.horsetrust.security.UserPrincipal;
 import com.horsetrust.services.EvidenceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/evidences")
+@Tag(name = "Evidences", description = "Subida y consulta de evidencias")
+@SecurityRequirement(name = "bearerAuth")
 public class EvidenceController {
 
     private final EvidenceService evidenceService;
@@ -23,6 +28,7 @@ public class EvidenceController {
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Subir evidencia", description = "Sube una evidencia asociada a un anuncio o un caballo. Al menos uno de los dos debe indicarse.")
     public EvidenceResponse upload(
             @Valid @RequestBody CreateEvidenceRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -31,6 +37,7 @@ public class EvidenceController {
 
     @GetMapping("/listing/{listingId}")
     @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Evidencias por anuncio", description = "Lista todas las evidencias asociadas a un anuncio del vendedor autenticado.")
     public List<EvidenceResponse> getByListing(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -39,6 +46,7 @@ public class EvidenceController {
 
     @GetMapping("/horse/{horseId}")
     @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Evidencias por caballo", description = "Lista todas las evidencias asociadas a un caballo del vendedor autenticado.")
     public List<EvidenceResponse> getByHorse(
             @PathVariable UUID horseId,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -48,6 +56,7 @@ public class EvidenceController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Eliminar evidencia", description = "Elimina una evidencia propia, solo si su estado es PENDING_REVIEW.")
     public void delete(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal) {
