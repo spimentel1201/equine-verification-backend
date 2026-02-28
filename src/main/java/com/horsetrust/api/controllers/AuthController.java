@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "Registro, login y refresco de token JWT")
+@Tag(name = "Auth", description = "Módulo de autenticación de usuarios.")
 public class AuthController {
 
     private final AuthService authService;

@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/horses")
-@Tag(name = "Horses", description = "Gestión de la identidad inmutable de caballos")
+@Tag(name = "Horses", description = "Gestión de caballos")
 @SecurityRequirement(name = "bearerAuth")
 public class HorseController {
 
@@ -25,7 +25,7 @@ public class HorseController {
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Registrar caballo", description = "Registra la identidad inmutable de un caballo. Requiere rol SELLER.")
+    @Operation(summary = "Registrar caballo", description = "Registra la identidad inmutable(no editable) de un caballo. Requiere rol VENDEDOR o SELLER.")
     public HorseResponse register(
             @Valid @RequestBody CreateHorseRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -34,7 +34,7 @@ public class HorseController {
 
     @GetMapping("/my-horses")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Mis caballos", description = "Devuelve los caballos registrados por el seller autenticado.")
+    @Operation(summary = "Mis caballos", description = "Devuelve los caballos registrados por el vendedor autenticado.")
     public List<HorseResponse> myHorses(@AuthenticationPrincipal UserPrincipal principal) {
         return horseService.myHorses(principal.getId());
     }

@@ -26,7 +26,7 @@ public class ListingController {
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Crear listing", description = "Crea un nuevo anuncio de venta en estado DRAFT. Requiere rol SELLER.")
+    @Operation(summary = "Crear listing", description = "Crea un nuevo anuncio de venta en estado DRAFT. Requiere rol VENDEDOR o SELLER.")
     public ListingResponse create(
             @Valid @RequestBody CreateListingRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -35,7 +35,7 @@ public class ListingController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Actualizar listing", description = "Edita un listing propio en estado DRAFT o REJECTED.")
+    @Operation(summary = "Actualizar anuncio", description = "Edita un anuncio propio en estado DRAFT o REJECTED.")
     public ListingResponse update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateListingRequest request,
@@ -45,7 +45,7 @@ public class ListingController {
 
     @PostMapping("/{id}/rollback")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Rollback a DRAFT (RF-12)", description = "Revierte un listing REJECTED a DRAFT para permitir correcciones y re-envío.")
+    @Operation(summary = "Rollback a borrador(estado DRAFT)", description = "Revierte un anuncio en estado rechazado(REJECTED) a borrador(DRAFT) para permitir correcciones y re-envío.")
     public ListingResponse rollbackToDraft(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -54,7 +54,7 @@ public class ListingController {
 
     @GetMapping("/my-listings")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Mis listings", description = "Devuelve todos los listings del seller autenticado.")
+    @Operation(summary = "Mis anuncios", description = "Devuelve todos los anuncios del vendedor autenticado.")
     public List<ListingResponse> myListings(@AuthenticationPrincipal UserPrincipal principal) {
         return listingService.myListings(principal.getId());
     }

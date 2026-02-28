@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/verifications")
-@Tag(name = "Verifications", description = "Flujo de verificación de listings (RF-07/08)")
+@Tag(name = "Verifications", description = "Flujo de verificación de listings")
 @SecurityRequirement(name = "bearerAuth")
 public class VerificationController {
 
@@ -28,7 +28,7 @@ public class VerificationController {
     @PostMapping("/request")
     @PreAuthorize("hasRole('SELLER')")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Solicitar verificación (RF-05/06)", description = "El seller solicita verificación de un listing en DRAFT o REJECTED. El listing pasa a PENDING_VERIFICATION.")
+    @Operation(summary = "Solicitar verificación", description = "El seller solicita verificación de un listing en DRAFT o REJECTED. El listing pasa a PENDING_VERIFICATION.")
     public VerificationResponse requestVerification(
             @Valid @RequestBody RequestVerificationRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -51,7 +51,7 @@ public class VerificationController {
 
     @PutMapping("/{id}/review")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Revisar verificación (RF-07/08)", description = "El admin aprueba (APPROVED→listing VERIFIED), rechaza (REJECTED→listing REJECTED) o pide info adicional (NEEDS_INFO).")
+    @Operation(summary = "Revisar verificación", description = "El admin aprueba (APPROVED→listing VERIFIED), rechaza (REJECTED→listing REJECTED) o pide info adicional (NEEDS_INFO).")
     public VerificationResponse review(
             @PathVariable UUID id,
             @Valid @RequestBody ReviewVerificationRequest request,

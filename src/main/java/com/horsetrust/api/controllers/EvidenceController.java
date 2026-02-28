@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/evidences")
-@Tag(name = "Evidences", description = "Subida y consulta de evidencias (RF-05/06)")
+@Tag(name = "Evidences", description = "Subida y consulta de evidencias")
 @SecurityRequirement(name = "bearerAuth")
 public class EvidenceController {
 
@@ -28,7 +28,7 @@ public class EvidenceController {
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Subir evidencia", description = "Sube una evidencia asociada a un listing o un horse. Al menos uno de los dos debe indicarse.")
+    @Operation(summary = "Subir evidencia", description = "Sube una evidencia asociada a un anuncio o un caballo. Al menos uno de los dos debe indicarse.")
     public EvidenceResponse upload(
             @Valid @RequestBody CreateEvidenceRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -37,7 +37,7 @@ public class EvidenceController {
 
     @GetMapping("/listing/{listingId}")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Evidencias por listing", description = "Lista todas las evidencias asociadas a un listing del seller autenticado.")
+    @Operation(summary = "Evidencias por anuncio", description = "Lista todas las evidencias asociadas a un anuncio del vendedor autenticado.")
     public List<EvidenceResponse> getByListing(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -46,7 +46,7 @@ public class EvidenceController {
 
     @GetMapping("/horse/{horseId}")
     @PreAuthorize("hasRole('SELLER')")
-    @Operation(summary = "Evidencias por horse", description = "Lista todas las evidencias asociadas a un horse del seller autenticado.")
+    @Operation(summary = "Evidencias por caballo", description = "Lista todas las evidencias asociadas a un caballo del vendedor autenticado.")
     public List<EvidenceResponse> getByHorse(
             @PathVariable UUID horseId,
             @AuthenticationPrincipal UserPrincipal principal) {
