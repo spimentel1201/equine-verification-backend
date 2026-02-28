@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,14 @@ public class AuthController {
     @Operation(summary = "Registrar nuevo usuario", description = "Crea una cuenta de usuario. Devuelve access y refresh token.")
     public ResponseEntity<LoginResponseDTO> register(@Valid @RequestBody RegisterRequest req) {
         return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/register-admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Registrar nuevo administrador", description = "Crea una cuenta de usuario administrador. Exclusivo para administradores.")
+    public ResponseEntity<UserResponse> registerAdmin(@Valid @RequestBody RegisterRequest req) {
+        return ResponseEntity.ok(authService.registerAdmin(req));
     }
 
     @PostMapping("/login")
