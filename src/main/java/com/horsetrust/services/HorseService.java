@@ -46,7 +46,6 @@ public class HorseService {
                 .toList();
     }
 
-    // Para cuando implementes PUT /horses/{id}
     @Transactional(readOnly = true)
     public void assertIdentityNotLocked(UUID horseId) {
         // Verificar si algún listing de este horse tiene verificaciones históricas

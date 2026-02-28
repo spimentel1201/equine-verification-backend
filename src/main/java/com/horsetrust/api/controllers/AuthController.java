@@ -3,6 +3,7 @@ package com.horsetrust.api.controllers;
 import com.horsetrust.api.dto.*;
 import com.horsetrust.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/register-admin")
     @PreAuthorize("hasRole('ADMIN')")
-    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Registrar nuevo administrador", description = "Crea una cuenta de usuario administrador. Exclusivo para administradores.")
     public ResponseEntity<UserResponse> registerAdmin(@Valid @RequestBody RegisterRequest req) {
         return ResponseEntity.ok(authService.registerAdmin(req));

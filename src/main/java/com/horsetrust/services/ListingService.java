@@ -25,7 +25,6 @@ public class ListingService {
         Horse horse = horseRepository.findById(req.horseId())
                 .orElseThrow(() -> new NotFoundException("Horse not found"));
 
-        // Regla razonable: solo podés listar tus caballos
         if (!horse.getOwner().getId().equals(sellerId)) {
             throw new ForbiddenOperationException("You can only create listings for your own horses");
         }

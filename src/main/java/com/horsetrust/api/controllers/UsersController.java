@@ -8,6 +8,8 @@ import com.horsetrust.services.UsersService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,13 +22,13 @@ public class UsersController {
 
     @GetMapping("/me")
     public UserProfileResponse me(
-            @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal) {
+            @AuthenticationPrincipal UserPrincipal principal) {
         return usersService.me(principal.getId());
     }
 
     @PutMapping("/me")
     public UserProfileResponse updateMe(
-            @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal,
+            @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody UpdateMeRequest req) {
         return usersService.updateMe(principal.getId(), req);
     }
