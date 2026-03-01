@@ -13,6 +13,12 @@ import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableMethodSecurity
@@ -46,7 +52,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authProvider)
             throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable()) // Desactivado ya que usamos JWT (Stateless), lo que nos hace inmunes a
+                                              // CSRF
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(eh -> eh
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -61,8 +69,37 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/listings").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())
-                .headers(h -> h.frameOptions(f -> f.disable()))
+                .headers(h -> h
+                        // OWASP: Prevenir Clickjacking (SAMEORIGIN permite uso de H2 local, pero
+                        // bloquea Iframes externos)
+                        .frameOptions(f -> f.sameOrigin())
+                        // OWASP: Forzar a los navegadores a respetar el Content-Type (Evita MIME
+                        // Sniffing)
+                        .contentTypeOptions(c -> {
+                        })
+                        // OWASP: Activar filtro XSS nativo del navegador
+                        .xssProtection(
+                                xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                        // OWASP: Strict HTTP Strict Transport Security (HSTS) para obligar conexiones
+                        // HTTPS
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000)))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+    }
+
+    // OWASP: Configuración explícita de CORS en lugar de permitir todo a ciegas
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // A nivel local, o apuntando al front específico (ej: http://localhost:3000)
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
