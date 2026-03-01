@@ -95,10 +95,12 @@ public class VerificationService {
 
     @Transactional(readOnly = true)
     public PageResponse<VerificationResponse> search(VerificationTarget target, VerificationStatus status,
-            Pageable pageable) {
+            LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Specification<Verification> spec = Specification
                 .where(com.horsetrust.repositories.specifications.VerificationSpecification.hasTarget(target))
-                .and(com.horsetrust.repositories.specifications.VerificationSpecification.hasStatus(status));
+                .and(com.horsetrust.repositories.specifications.VerificationSpecification.hasStatus(status))
+                .and(com.horsetrust.repositories.specifications.VerificationSpecification.createdAtBetween(startDate,
+                        endDate));
 
         Page<Verification> page = verificationRepository.findAll(spec, pageable);
         return PageResponse.from(page.map(this::toResponse));

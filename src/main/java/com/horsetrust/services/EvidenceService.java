@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -75,6 +79,20 @@ public class EvidenceService {
         return evidenceRepository.findAllByHorse_Id(horseId).stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<EvidenceResponse> search(com.horsetrust.models.enums.EvidenceType type, EvidenceStatus status,
+            UUID listingId, UUID horseId, UUID uploaderId, Pageable pageable) {
+        Specification<Evidence> spec = Specification
+                .where(com.horsetrust.repositories.specifications.EvidenceSpecification.isType(type))
+                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.isStatus(status))
+                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.hasListing(listingId))
+                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.hasHorse(horseId))
+                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.hasUploader(uploaderId));
+
+        Page<Evidence> page = evidenceRepository.findAll(spec, pageable);
+        return PageResponse.from(page.map(this::toResponse));
     }
 
     @Transactional

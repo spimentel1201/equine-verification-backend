@@ -22,4 +22,18 @@ public class VerificationSpecification {
             return builder.equal(root.get("target"), target);
         };
     }
+
+    public static Specification<Verification> createdAtBetween(java.time.LocalDateTime startDate,
+            java.time.LocalDateTime endDate) {
+        return (root, query, builder) -> {
+            if (startDate != null && endDate != null) {
+                return builder.between(root.get("createdAt"), startDate, endDate);
+            } else if (startDate != null) {
+                return builder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
+            } else if (endDate != null) {
+                return builder.lessThanOrEqualTo(root.get("createdAt"), endDate);
+            }
+            return builder.conjunction();
+        };
+    }
 }

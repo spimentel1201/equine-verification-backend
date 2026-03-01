@@ -41,12 +41,14 @@ public class VerificationController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Verificaciones con filtros (ADMIN)", description = "Lista todas las verificaciones paginadas. Filtra por target y status. Exclusivo para administradores.")
+    @Operation(summary = "Verificaciones con filtros (ADMIN)", description = "Lista todas las verificaciones paginadas. Filtra por target, status y fechas. Exclusivo para administradores.")
     public PageResponse<VerificationResponse> search(
             @RequestParam(required = false) VerificationTarget target,
             @RequestParam(required = false) VerificationStatus status,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endDate,
             @PageableDefault(size = 10) Pageable pageable) {
-        return verificationService.search(target, status, pageable);
+        return verificationService.search(target, status, startDate, endDate, pageable);
     }
 
     @GetMapping("/listing/{listingId}")
