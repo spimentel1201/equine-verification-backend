@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +39,18 @@ public class HorseController {
     @Operation(summary = "Mis caballos", description = "Devuelve los caballos registrados por el vendedor autenticado.")
     public List<HorseResponse> myHorses(@AuthenticationPrincipal UserPrincipal principal) {
         return horseService.myHorses(principal.getId());
+    }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Buscar caballos", description = "Lista y busca caballos registrados en la plataforma mediante filtros dinámicos.")
+    public PageResponse<HorseResponse> search(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String breed,
+            @RequestParam(required = false) Integer minAge,
+            @RequestParam(required = false) Integer maxAge,
+            @RequestParam(required = false) com.horsetrust.models.enums.HorseGender gender,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return horseService.search(name, breed, minAge, maxAge, gender, pageable);
     }
 }
