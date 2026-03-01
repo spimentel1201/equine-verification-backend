@@ -12,6 +12,7 @@ El proyecto **Equine Verification Backend** está diseñado bajo los principios 
 6. **Autenticación:** Proveedor BCryptPasswordEncoder (Hash de contraseñas de ida y múltiples validaciones de Auth).
 7. **Documentación Automática de API:** OpenAPI 3 / Swagger-UI.
 8. **Manejo de Variables de Entorno:** dotenv-java (Archivos `.env`).
+9. **Media y Nube Externa:** Integración Java SDK con Cloudinary para subidas/descarte mediante flujos `multipart/form-data`.
 
 ## 🧱 Estructura de Paquetes (Patrón de Capas)
 
@@ -28,7 +29,8 @@ Patrón Data Transfer Object. Los `Record` de Java inmutables se utilizan para i
 * *Ej.* `CreateListingRequest`, `VerificationResponse`, `PageResponse`.
 
 ### 3. `services/` (Capa Principal / Lógica de Negocios)
-Contiene las sentencias `@Service` ricas en lógica empresarial.
+Contiene las sentencias `@Service` ricas en lógica empresarial. Gestiona microservicios adaptables y centraliza lógicas comunes.
+* **Componentes de Integración:** Emplea envoltorios (Wrappers) limpios (ej. `CloudinaryService`) que aíslan las bibliotecas foráneas. Si el día de mañana se migra Amazon S3, el resto del código del sistema no padece refactorización ni dolores gracias a este aislamiento interno.
 * Gestiona todo mediante `@Transactional` (Commit or Rollback en cascada preventivo).
 * Transforma modelos de Base de datos (Entities) a respuestas (DTOs) para exponer al controlador de manera acotada.
 * Contiene validación exhaustiva de lógicas ("No puedes aprobar un Listing sin revisar"). Las fallas de negocio arrojan excepciones encapsuladas.
