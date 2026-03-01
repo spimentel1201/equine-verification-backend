@@ -12,8 +12,13 @@ import java.math.BigDecimal;
 public class ListingSpecification {
 
     public static Specification<Listing> isStatus(ListingStatus status) {
-        return (root, query, builder) -> status == null ? builder.conjunction()
-                : builder.equal(root.get("status"), status);
+        return (root, query, builder) -> {
+            if (Long.class != query.getResultType()) { // No fetch paged count query
+                root.fetch("horse", JoinType.INNER);
+                root.fetch("seller", JoinType.INNER);
+            }
+            return status == null ? builder.conjunction() : builder.equal(root.get("status"), status);
+        };
     }
 
     public static Specification<Listing> titleOrDescriptionContains(String keyword) {
