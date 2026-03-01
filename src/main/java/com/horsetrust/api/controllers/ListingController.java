@@ -8,10 +8,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,5 +60,18 @@ public class ListingController {
     @Operation(summary = "Mis anuncios", description = "Devuelve todos los anuncios del vendedor autenticado.")
     public List<ListingResponse> myListings(@AuthenticationPrincipal UserPrincipal principal) {
         return listingService.myListings(principal.getId());
+    }
+
+    @GetMapping
+    @Operation(summary = "Buscar anuncios", description = "Busca todos los caballos verificados con filtros y paginación.")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements // Limpia los requirements globales para este endpoint
+    public PageResponse<ListingResponse> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String breed,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return listingService.findActiveListings(q, minPrice, maxPrice, location, breed, pageable);
     }
 }

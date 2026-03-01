@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -90,10 +94,14 @@ public class VerificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<VerificationResponse> getPending() {
-        return verificationRepository.findAllByStatus(VerificationStatus.PENDING).stream()
-                .map(this::toResponse)
-                .toList();
+    public PageResponse<VerificationResponse> search(VerificationTarget target, VerificationStatus status,
+            Pageable pageable) {
+        Specification<Verification> spec = Specification
+                .where(com.horsetrust.repositories.specifications.VerificationSpecification.hasTarget(target))
+                .and(com.horsetrust.repositories.specifications.VerificationSpecification.hasStatus(status));
+
+        Page<Verification> page = verificationRepository.findAll(spec, pageable);
+        return PageResponse.from(page.map(this::toResponse));
     }
 
     private VerificationResponse toResponse(Verification v) {

@@ -5,10 +5,15 @@ import com.horsetrust.common.exception.*;
 import com.horsetrust.models.entities.*;
 import com.horsetrust.models.enums.ListingStatus;
 import com.horsetrust.repositories.*;
+import com.horsetrust.repositories.specifications.ListingSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,6 +94,22 @@ public class ListingService {
         return listingRepository.findAllBySeller_Id(sellerId).stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ListingResponse> findActiveListings(
+            String search, BigDecimal minPrice, BigDecimal maxPrice,
+            String location, String breed, Pageable pageable) {
+
+        Specification<Listing> spec = Specification
+                .where(ListingSpecification.isStatus(ListingStatus.VERIFIED)) // Only verified listings are public
+                .and(ListingSpecification.titleOrDescriptionContains(search))
+                .and(ListingSpecification.priceBetween(minPrice, maxPrice))
+                .and(ListingSpecification.locationContains(location))
+                .and(ListingSpecification.horseBreedContains(breed));
+
+        Page<Listing> page = listingRepository.findAll(spec, pageable);
+        return PageResponse.from(page.map(this::toResponse));
     }
 
     private String generateTitle(Horse horse) {

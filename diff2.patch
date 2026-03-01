@@ -1,0 +1,74 @@
+﻿diff --git a/src/main/java/com/horsetrust/api/controllers/AuthController.java b/src/main/java/com/horsetrust/api/controllers/AuthController.java
+index 73fd7cc..00e2ed2 100644
+--- a/src/main/java/com/horsetrust/api/controllers/AuthController.java
++++ b/src/main/java/com/horsetrust/api/controllers/AuthController.java
+@@ -3,6 +3,7 @@ package com.horsetrust.api.controllers;
+ import com.horsetrust.api.dto.*;
+ import com.horsetrust.services.AuthService;
+ import io.swagger.v3.oas.annotations.Operation;
++import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+ import io.swagger.v3.oas.annotations.tags.Tag;
+ import jakarta.validation.Valid;
+ import lombok.RequiredArgsConstructor;
+@@ -26,7 +27,7 @@ public class AuthController {
+ 
+     @PostMapping("/register-admin")
+     @PreAuthorize("hasRole('ADMIN')")
+-    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
++    @SecurityRequirement(name = "bearerAuth")
+     @Operation(summary = "Registrar nuevo administrador", description = "Crea una cuenta de usuario administrador. Exclusivo para administradores.")
+     public ResponseEntity<UserResponse> registerAdmin(@Valid @RequestBody RegisterRequest req) {
+         return ResponseEntity.ok(authService.registerAdmin(req));
+diff --git a/src/main/java/com/horsetrust/api/controllers/UsersController.java b/src/main/java/com/horsetrust/api/controllers/UsersController.java
+index 67b88f2..526c9d4 100644
+--- a/src/main/java/com/horsetrust/api/controllers/UsersController.java
++++ b/src/main/java/com/horsetrust/api/controllers/UsersController.java
+@@ -8,6 +8,8 @@ import com.horsetrust.services.UsersService;
+ import io.swagger.v3.oas.annotations.tags.Tag;
+ import jakarta.validation.Valid;
+ import lombok.RequiredArgsConstructor;
++
++import org.springframework.security.core.annotation.AuthenticationPrincipal;
+ import org.springframework.web.bind.annotation.*;
+ 
+ @RestController
+@@ -20,13 +22,13 @@ public class UsersController {
+ 
+     @GetMapping("/me")
+     public UserProfileResponse me(
+-            @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal) {
++            @AuthenticationPrincipal UserPrincipal principal) {
+         return usersService.me(principal.getId());
+     }
+ 
+     @PutMapping("/me")
+     public UserProfileResponse updateMe(
+-            @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal principal,
++            @AuthenticationPrincipal UserPrincipal principal,
+             @Valid @RequestBody UpdateMeRequest req) {
+         return usersService.updateMe(principal.getId(), req);
+     }
+diff --git a/src/main/java/com/horsetrust/services/HorseService.java b/src/main/java/com/horsetrust/services/HorseService.java
+index 61f6b13..02c7609 100644
+--- a/src/main/java/com/horsetrust/services/HorseService.java
++++ b/src/main/java/com/horsetrust/services/HorseService.java
+@@ -46,7 +46,6 @@ public class HorseService {
+                 .toList();
+     }
+ 
+-    // Para cuando implementes PUT /horses/{id}
+     @Transactional(readOnly = true)
+     public void assertIdentityNotLocked(UUID horseId) {
+         // Verificar si alg├║n listing de este horse tiene verificaciones hist├│ricas
+diff --git a/src/main/java/com/horsetrust/services/ListingService.java b/src/main/java/com/horsetrust/services/ListingService.java
+index 5db3562..60d150f 100644
+--- a/src/main/java/com/horsetrust/services/ListingService.java
++++ b/src/main/java/com/horsetrust/services/ListingService.java
+@@ -25,7 +25,6 @@ public class ListingService {
+         Horse horse = horseRepository.findById(req.horseId())
+                 .orElseThrow(() -> new NotFoundException("Horse not found"));
+ 
+-        // Regla razonable: solo pod├⌐s listar tus caballos
+         if (!horse.getOwner().getId().equals(sellerId)) {
+             throw new ForbiddenOperationException("You can only create listings for your own horses");
+         }

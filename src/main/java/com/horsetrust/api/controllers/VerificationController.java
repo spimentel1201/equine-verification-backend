@@ -8,10 +8,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.horsetrust.models.enums.VerificationStatus;
+import com.horsetrust.models.enums.VerificationTarget;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,11 +39,14 @@ public class VerificationController {
         return verificationService.requestVerification(request.listingId(), principal.getId());
     }
 
-    @GetMapping("/pending")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Verificaciones pendientes (ADMIN)", description = "Lista todas las verificaciones con estado PENDING. Exclusivo para administradores.")
-    public List<VerificationResponse> getPending() {
-        return verificationService.getPending();
+    @Operation(summary = "Verificaciones con filtros (ADMIN)", description = "Lista todas las verificaciones paginadas. Filtra por target y status. Exclusivo para administradores.")
+    public PageResponse<VerificationResponse> search(
+            @RequestParam(required = false) VerificationTarget target,
+            @RequestParam(required = false) VerificationStatus status,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return verificationService.search(target, status, pageable);
     }
 
     @GetMapping("/listing/{listingId}")
