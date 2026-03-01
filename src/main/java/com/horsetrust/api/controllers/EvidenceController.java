@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.horsetrust.models.enums.EvidenceStatus;
+import com.horsetrust.models.enums.EvidenceType;
+import com.horsetrust.models.enums.UserRole;
 
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +73,7 @@ public class EvidenceController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Buscar Evidencias", description = "Los vendedores solo ven sus evidencias. Los ADMIN ven todas. Soporta filtros dinámicos.")
     public PageResponse<EvidenceResponse> search(
-            @RequestParam(required = false) com.horsetrust.models.enums.EvidenceType type,
+            @RequestParam(required = false) EvidenceType type,
             @RequestParam(required = false) EvidenceStatus status,
             @RequestParam(required = false) UUID listingId,
             @RequestParam(required = false) UUID horseId,
@@ -81,7 +83,7 @@ public class EvidenceController {
 
         // Regla de negocio: Si no es Admin, forzar a que SÓLO pueda ver sus Propias
         // Evidencias
-        boolean isAdmin = principal.getRole() == com.horsetrust.models.enums.UserRole.ADMIN;
+        boolean isAdmin = principal.getRole() == UserRole.ADMIN;
 
         UUID finalUploaderId = isAdmin ? uploaderId : principal.getId();
 

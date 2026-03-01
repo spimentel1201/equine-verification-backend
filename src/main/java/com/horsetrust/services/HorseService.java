@@ -4,6 +4,7 @@ import com.horsetrust.api.dto.*;
 import com.horsetrust.common.exception.*;
 import com.horsetrust.models.entities.Horse;
 import com.horsetrust.models.entities.User;
+import com.horsetrust.repositories.HorsePhotoRepository;
 import com.horsetrust.repositories.HorseRepository;
 import com.horsetrust.repositories.UserRepository; // asumido
 import com.horsetrust.repositories.VerificationRepository;
@@ -29,7 +30,7 @@ public class HorseService {
         private final HorseRepository horseRepository;
         private final UserRepository userRepository;
         private final VerificationRepository verificationRepository;
-        private final com.horsetrust.repositories.HorsePhotoRepository horsePhotoRepository;
+        private final HorsePhotoRepository horsePhotoRepository;
         private final CloudinaryService cloudinaryService;
 
         @Transactional

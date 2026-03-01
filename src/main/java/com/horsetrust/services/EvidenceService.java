@@ -5,6 +5,8 @@ import com.horsetrust.common.exception.*;
 import com.horsetrust.models.entities.*;
 import com.horsetrust.models.enums.EvidenceStatus;
 import com.horsetrust.repositories.*;
+import com.horsetrust.repositories.specifications.EvidenceSpecification;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,12 +111,11 @@ public class EvidenceService {
                         EvidenceStatus status,
                         UUID listingId, UUID horseId, UUID uploaderId, Pageable pageable) {
                 Specification<Evidence> spec = Specification
-                                .where(com.horsetrust.repositories.specifications.EvidenceSpecification.isType(type))
-                                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.isStatus(status))
-                                .and(com.horsetrust.repositories.specifications.EvidenceSpecification
-                                                .hasListing(listingId))
-                                .and(com.horsetrust.repositories.specifications.EvidenceSpecification.hasHorse(horseId))
-                                .and(com.horsetrust.repositories.specifications.EvidenceSpecification
+                                .where(EvidenceSpecification.isType(type))
+                                .and(EvidenceSpecification.isStatus(status))
+                                .and(EvidenceSpecification.hasListing(listingId))
+                                .and(EvidenceSpecification.hasHorse(horseId))
+                                .and(EvidenceSpecification
                                                 .hasUploader(uploaderId));
 
                 Page<Evidence> page = evidenceRepository.findAll(spec, pageable);
@@ -136,8 +137,6 @@ public class EvidenceService {
                                 cloudinaryService.delete(evidence.getCloudinaryPublicId());
                         }
                 } catch (IOException e) {
-                        // Log it, but delete the DB record anyway or throw exception depending on
-                        // policy
                         System.err.println("Failed to delete Cloudinary asset: " + evidence.getCloudinaryPublicId());
                 }
 
