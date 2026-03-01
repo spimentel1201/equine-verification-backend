@@ -45,11 +45,21 @@ erDiagram
         VARCHAR type "MEDICAL_RECORD|OWNERSHIP_DOC|DNA_TEST|IMAGE|VIDEO|OTHER"
         VARCHAR status "PENDING_REVIEW|REJECTED|VERIFIED"
         VARCHAR fileUrl
+        VARCHAR cloudinaryPublicId
         TEXT description
         TEXT metadata
         UUID listingId FK "References listings (nullable)"
         UUID horseId FK "References horses (nullable)"
         UUID uploaderId FK "References users"
+        TIMESTAMP uploadedAt
+    }
+
+    horse_photos {
+        UUID id PK
+        VARCHAR imageUrl
+        VARCHAR cloudinaryPublicId
+        INTEGER displayOrder "Positional 0-4"
+        UUID horseId FK "References horses"
         TIMESTAMP uploadedAt
     }
 
@@ -75,6 +85,7 @@ erDiagram
     users ||--o{ horses : "owns (One-to-Many)"
     users ||--o{ listings : "creates"
     horses ||--o{ listings : "listed in"
+    horses ||--o{ horse_photos : "has (max 5)"
     users ||--o{ evidences : "uploads"
     listings ||--o{ evidences : "has"
     horses ||--o{ evidences : "has (standalone)"
