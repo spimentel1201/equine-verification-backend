@@ -31,3 +31,7 @@ tmp/
 
 # Documentation (User specific)
 .docs/
+
+# Environments
+.env
+.env.*
