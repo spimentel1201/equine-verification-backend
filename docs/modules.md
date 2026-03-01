@@ -16,6 +16,7 @@ Todo aquel humano que desee publicar debe pertenecer como Entidad `User`.
 ## 3. Módulo Equinos (`HorseController`)
 Estructura Inmutable (De sólo Lectura). Antes de que un Vendedor intente Publicar la venta un Caballo en el Marketplace de Anuncios, él debe declarar el elemento que se vende (El Caballo / Horse). 
 * **Registros de Raza y Genética:** Contiene Nombre, Raza (`breed`), Edad, y Género (MACHO, HEMBRA, CASTRADO).
+* **Galería de Fotos (Cloudinary):** El sistema permite al dueño anexar su propia galería visual al equino, con una sólida limitación técnica de **máximo 5 fotos** reales por animal, alojadas de forma automática en **Cloudinary**.
 * **Limitación y candado anti-fraude:** Parte de la arquitectura fuerza a bloquear los datos bio-históricos del animal **UNA VEZ** se someta formalmente a un proceso posterior de Verificación humana; en ese punto quedan "anclados/locked", de modo que un estafador moderno ya no podrá cambiar en un punto en el futuro una "Raza Falsificada" o nombre.
 
 ## 4. Módulo Anuncios del Marketplace (`ListingController`)
@@ -29,6 +30,7 @@ Agrupa el proceso general de venta en el mercado. Un `Listing` enlaza "1 Vendedo
 
 ## 5. Módulo de Evidencias Documentales (`EvidenceController`)
 Alimenta sustancialmente la aprobación de un `Listing`. Es libre de subir por el Seller y se relaciona en cadena (Puede apuntar tanto a un Anuncio `Listing` como directo a la vida general de un Caballo `Horse`).
+* **Nube Segura (Cloudinary):** Todas las evidencias (fotos, videos o PDFs de soporte) envían flujos `multipart/form-data` pesados desde el Frontend. El Microservicio de Cloudinary valida el streaming del byte-array para generar URLs públicas estólidas e idóneas para ser evaluadas visualmente por el equipo `ADMIN`. Al rechazar/borrar una evidencia de estado temprano, los binarios se destruyen físicamente del proveedor Cloud.
 * **Formatos de Atestación Múltiple (`EvidenceType`):** Imágenes Generales `IMAGE`, Vete-Chequeos médicos (`MEDICAL_RECORD`), Certificaciones Legales de ADN/Raza (`OWNERSHIP_DOC`, `DNA_TEST`) o Audios (`VIDEO`).
 * Soportan Subida de estado `PENDING_REVIEW` que el seller puede eliminar antes del salto a auditoría final.
 

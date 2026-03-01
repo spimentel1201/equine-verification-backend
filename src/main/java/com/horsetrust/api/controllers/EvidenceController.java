@@ -28,14 +28,15 @@ public class EvidenceController {
 
     private final EvidenceService evidenceService;
 
-    @PostMapping
+    @PostMapping(consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('SELLER')")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Subir evidencia", description = "Sube una evidencia asociada a un anuncio o un caballo. Al menos uno de los dos debe indicarse.")
+    @Operation(summary = "Subir evidencia", description = "Sube una evidencia (archivo) asociada a un anuncio o un caballo. Al menos uno de los dos debe indicarse.")
     public EvidenceResponse upload(
-            @Valid @RequestBody CreateEvidenceRequest request,
+            @RequestPart("file") org.springframework.web.multipart.MultipartFile file,
+            @Valid @RequestPart("data") CreateEvidenceRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        return evidenceService.upload(request, principal.getId());
+        return evidenceService.upload(request, file, principal.getId());
     }
 
     @GetMapping("/listing/{listingId}")

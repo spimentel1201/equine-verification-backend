@@ -47,6 +47,9 @@ public class Evidence {
     @Column(length = 2000)
     private String metadata;
 
+    @Column(length = 255)
+    private String cloudinaryPublicId;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime uploadedAt;

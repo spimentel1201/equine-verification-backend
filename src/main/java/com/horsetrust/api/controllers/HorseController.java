@@ -53,4 +53,26 @@ public class HorseController {
             @PageableDefault(size = 10) Pageable pageable) {
         return horseService.search(name, breed, minAge, maxAge, gender, pageable);
     }
+
+    @PostMapping(value = "/{id}/photos", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('SELLER')")
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.CREATED)
+    @Operation(summary = "Subir foto de caballo", description = "Sube una foto a la galería del caballo. Límite: 5 fotos.")
+    public HorsePhotoResponse addPhoto(
+            @PathVariable java.util.UUID id,
+            @RequestPart("file") org.springframework.web.multipart.MultipartFile file,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return horseService.addPhoto(id, file, principal.getId());
+    }
+
+    @DeleteMapping("/{horseId}/photos/{photoId}")
+    @PreAuthorize("hasRole('SELLER')")
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    @Operation(summary = "Eliminar foto de caballo", description = "Elimina una foto de la galería particular del caballo.")
+    public void deletePhoto(
+            @PathVariable java.util.UUID horseId,
+            @PathVariable java.util.UUID photoId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        horseService.deletePhoto(horseId, photoId, principal.getId());
+    }
 }

@@ -5,11 +5,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record HorseResponse(
-        UUID id,
-        String name,
-        String breed,
-        Integer age,
-        HorseGender gender,
-        UUID ownerId,
-        LocalDateTime createdAt
-) {}
+                UUID id,
+                String name,
+                String breed,
+                Integer age,
+                HorseGender gender,
+                UUID ownerId,
+                LocalDateTime createdAt,
+                java.util.List<HorsePhotoResponse> photos) {
+}

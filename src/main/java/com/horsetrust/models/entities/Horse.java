@@ -99,4 +99,9 @@ public class Horse {
     @EqualsAndHashCode.Exclude
     @Builder.Default
     private List<Evidence> evidences = new ArrayList<>();
+    @OneToMany(mappedBy = "horse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<HorsePhoto> photos = new ArrayList<>();
 }
